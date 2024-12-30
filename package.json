@@ -16,7 +16,9 @@
     "express": "^4.18.2",
     "hbs": "^4.2.0",
     "morgan": "^1.10.0",
-    "path": "^0.12.7"
+    "openai": "^4.77.0",
+    "path": "^0.12.7",
+    "youtube-dl-exec": "^3.0.10"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
