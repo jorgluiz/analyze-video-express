@@ -3,6 +3,8 @@ import cors from "cors";
 import morgan from "morgan";
 import hbs from "hbs";
 import path from 'path';
+import fs from "fs";
+import youtubedl from 'youtube-dl-exec'
 
 import * as middleware from "./utils/middleware.js";
 import helloRoute from "./routes/helloRouter.js";
@@ -42,9 +44,9 @@ app.get("/", (req, res) => {
 
 app.post('/analise-video', async (req, res) => {
   const { urlVideo } = req.body;
-  console.log(urlVideo)
+  console.log(urlVideo, "urlVideo")
 
-  const tempDir = path.resolve(__dirname, 'downloads'); // Diretório temporário
+  const tempDir = path.resolve(path.resolve(), 'src/downloads'); // Diretório temporário
   if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
 
@@ -62,7 +64,7 @@ app.post('/analise-video', async (req, res) => {
     const formatResponse = await splitTextIntoChunks(transcriptionText);
     console.log(formatResponse)
 
-    res.send(formatResponse);
+    res.send({ text: formatResponse });
 
   } catch (error) {
     console.error(error);
