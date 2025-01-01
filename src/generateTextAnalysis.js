@@ -5,7 +5,7 @@ if (process.env.NODE_ENV !== "production") {
   config();
 }
 
-const newObject = {
+const systemMessage = {
   role: "system",
   content: "Resumo sobre o que texto aborda, o que texto destaca e se hover agluma solução"
 };
@@ -17,7 +17,7 @@ const openai = new OpenAI({
 
 const MAX_TOKENS = 1024; // Defina um limite seguro para cada bloco (ajuste conforme necessário).
 
-function splitText(text, maxTokens) {
+function splitTextByTokenLimit(text, maxTokens) {
   const parts = [];
   let currentPart = "";
 
@@ -38,17 +38,17 @@ function splitText(text, maxTokens) {
 }
 
 // Divide o texto em blocos menores para respeitar o limite de tokens.
-export default async function splitTextIntoChunks(data) {
+export default async function processTextInChunks(data) {
   return new Promise(async (resolve, reject) => {
     try {
       const transcribedVideo = data;
-      const parts = splitText(transcribedVideo, MAX_TOKENS);
+      const parts = splitTextByTokenLimit(transcribedVideo, MAX_TOKENS);
 
       let finalResponse = "";
 
       for (const part of parts) {
         const updatedArray = [
-          newObject,
+          systemMessage,
           {
             role: "user",
             content: part
