@@ -74,7 +74,7 @@ app.post('/analyze-video', async (req, res) => {
     const formatResponse = await processTextInChunks(transcriptionText);
     // console.log(formatResponse)
 
-    res.send({ text: formatResponse });
+    res.send(formatResponse);
 
   } catch (error) {
     console.error(error);

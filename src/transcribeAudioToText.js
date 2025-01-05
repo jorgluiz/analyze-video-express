@@ -10,6 +10,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export default async function transcribeAudioToText() {
   const filePath = path.join(path.resolve(), "src/downloads/audio.mp3");
+  console.log(filePath)
 
   const audioStream = fs.createReadStream(filePath);
 

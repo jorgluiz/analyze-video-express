@@ -9,7 +9,14 @@
     body {
       margin: 0;
       padding: 0;
+      line-height: 28px;
     }
+
+    p {
+      font-size: 18px;
+      /* 16px baseado no `body` */
+    }
+
 
     /* Estilos para o círculo de carregamento */
     #loadingContainer {
@@ -57,53 +64,68 @@
       display: block;
     }
 
-    img {
-      display: block;
-      margin: 0 auto;
-      width: 100%;
-      /* A imagem ocupará 100% da largura do seu container */
-      max-width: 600px;
-      /* A imagem não ultrapassará 600px de largura */
-      height: auto;
-      /* Mantém a proporção da imagem */
-      border: 1px solid #111;
+    .container {
+      display: flex;
+      flex-direction: column;
+      margin: 30px 30px;
+    }
 
-      @media (max-width: 800px) {
-        margin: 50% auto;
+    @media (min-width: 768px) {
+      button {
+        margin-top: 10px;
       }
     }
 
-    .container {
-      display: flex;
-      justify-content: center;
-      margin: 30px 30px;
+    @media (max-width: 768px) {
+      .container {
+        display: flex;
+        flex-direction: column;
+      }
+
+      button {
+        margin-top: 10px;
+      }
+
+      p {
+        font-size: 1.125rem;
+      }
+
+      #inputData {
+        border-radius: 10px;
+      }
+    }
+
+    button {
+      background-color: #f44336;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 10px;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <div>
-      <label for="fname">conta no Twitter:</label>
-      <input type="text" id="inputData" placeholder="exemplo: CNNBrasil">
-      <button onclick="buscarDados()">buscar dados</button>
-    </div>
+    <label for="fname">Resumo vídeo do youtube: </label>
+    <input type="text" id="inputData" placeholder="cole link de um vídeo do youtube aqui">
+    <button onclick="buscarDados()">ANALISAR VÍDEO</button>
+    <p class="analyzed-text"></p>
   </div>
-  <div class="img-responsive">
-    <img src="../images/analyze-feelings.png" alt="">
-  </div>
-
   <!-- Container para o círculo de carregamento -->
   <div id="loadingContainer">
     <div id="loadingCircle"></div>
   </div>
   <script>
-    const body = document.querySelector('body');
-    const newDiv = document.createElement('div');
-    body.appendChild(newDiv);
+    const paragraph = document.querySelector('.analyzed-text');
 
     const buscarDados = async () => {
-      newDiv.innerHTML = '';
+      paragraph.innerHTML = '';
       const loadingContainer = document.getElementById('loadingContainer');
       loadingContainer.style.display = 'block';
 
@@ -111,7 +133,7 @@
 
       try {
         // Envia o valor do input como JSON no corpo da requisição
-        const response = await fetch('/analyze-video', {
+        const responseText = await fetch('/analyze-video', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -119,8 +141,8 @@
           body: JSON.stringify({ urlVideo })
         });
 
-        const data = await response.json();
-        newDiv.innerHTML = JSON.stringify(data); // Exibe a resposta
+        const data = await responseText.text();
+        paragraph.innerHTML = data; // Exibe a resposta
       } catch (error) {
         console.log("Erro:", error);
       } finally {
