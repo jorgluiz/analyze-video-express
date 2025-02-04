@@ -1,13 +1,31 @@
+diff --git a/alteracoes.patch b/alteracoes.patch
+index 7a6a0ba..e69de29 100644
+--- a/alteracoes.patch
++++ b/alteracoes.patch
+@@ -1,13 +0,0 @@
+-diff --git a/src/public/views/index.html b/src/public/views/index.html
+-index 682b4c7..4ccf554 100644
+---- a/src/public/views/index.html
+-+++ b/src/public/views/index.html
+-@@ -145,7 +145,7 @@
+- 
+-       try {
+-         // Envia o valor do input como JSON no corpo da requisição
+--        const responseText = await fetch('http://localhost:3333/analyze-video', {
+-+        const responseText = await fetch('analyze-video-express-production.up.railway.app/analyze-video', {
+-           method: 'POST',
+-           headers: {
+-             'Content-Type': 'application/json'
 diff --git a/src/public/views/index.html b/src/public/views/index.html
-index 682b4c7..4ccf554 100644
+index 4ccf554..cc3883e 100644
 --- a/src/public/views/index.html
 +++ b/src/public/views/index.html
 @@ -145,7 +145,7 @@
  
        try {
          // Envia o valor do input como JSON no corpo da requisição
--        const responseText = await fetch('http://localhost:3333/analyze-video', {
-+        const responseText = await fetch('analyze-video-express-production.up.railway.app/analyze-video', {
+-        const responseText = await fetch('analyze-video-express-production.up.railway.app/analyze-video', {
++        const responseText = await fetch(' http://localhost:8080/analyze-video', {
            method: 'POST',
            headers: {
              'Content-Type': 'application/json'
