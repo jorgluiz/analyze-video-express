@@ -34,7 +34,9 @@ app.use(express.static(path.join(path.resolve(), "public")));
 // 4. Encadear lógica entre diferentes partes da aplicação.
 // Em resumo, middleware conecta e controla o fluxo de dados entre o cliente e o servidor.
 app.use(express.json()); // Parse JSON
-app.use(cors()); // Habilitar CORS
+app.use(cors({
+  origin: 'http://localhost:3333', // ou 'http://localhost'
+}));
 app.use(morgan("tiny")); // Logger de requisições
 
 // Rotas de páginas
