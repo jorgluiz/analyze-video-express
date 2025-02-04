@@ -1,0 +1,13 @@
+diff --git a/src/public/views/index.html b/src/public/views/index.html
+index 682b4c7..4ccf554 100644
+--- a/src/public/views/index.html
++++ b/src/public/views/index.html
+@@ -145,7 +145,7 @@
+ 
+       try {
+         // Envia o valor do input como JSON no corpo da requisição
+-        const responseText = await fetch('http://localhost:3333/analyze-video', {
++        const responseText = await fetch('analyze-video-express-production.up.railway.app/analyze-video', {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json'
