@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== "production") {
 // A mensagem fornece instruções para que o modelo resuma os pontos importantes do texto fornecido.
 const systemMessage = {
   role: "system",
-  content: "Você está recebendo um texto dividido em múltiplos blocos. Crie um breve resumo, destacando os pontos importantes e indicando se há alguma solução ou conclusão. No final, forneça um resumo geral de todo o texto."
+  content: "Você está recebendo um texto dividido em múltiplos blocos. Crie um pequeno resumo. Descarte frases como: inscrição estão disponíveis, se inscreva no canal ou frases que pode ser inúteis."
 };
 
 // Inicializa o cliente OpenAI com a chave da API definida nas variáveis de ambiente.
@@ -64,42 +64,27 @@ export default async function processTextInChunks(data) {
       const transcribedVideo = data; // Armazena o texto transcrito.
       const parts = splitTextByTokenLimit(transcribedVideo, MAX_TOKENS); // Divide o texto em blocos.
       // console.log(parts)
+      let finalResponse = "";
 
-      let finalResponse = ""; // Armazena o resumo final concatenado.
-
-      for (let i = 0; i < parts.length; i++) {
-        const isLastPart = i === parts.length - 1; // Verifica se este é o último bloco.
-        const part = parts[i];
-
-        // Se for o último bloco, adiciona um contexto extra à mensagem.
+      for (const part of parts) {
         const updatedArray = [
           systemMessage,
           {
             role: "user",
-            content: part,
-          },
-          ...(isLastPart
-            ? [
-              {
-                role: "user",
-                content: "Todos os texto foram enviados. Agora, por favor, forneça um resumo geral de todo o texto, destacando os pontos principais e apresentando uma conclusão, se houver."
-              },
-            ]
-            : []),
+            content: part
+          }
         ];
 
-        console.log(updatedArray)
-        // Faz uma chamada para a API da OpenAI utilizando o modelo GPT-4.
         const response = await openai.chat.completions.create({
-          model: "gpt-4o", // Modelo utilizado.
-          messages: updatedArray // Mensagens enviadas.
+          model: "gpt-4o",
+          messages: updatedArray
         });
 
-        const content = response.choices[0].message.content; // Extrai o conteúdo da resposta.
-        finalResponse += content; // Concatena o conteúdo da resposta ao resultado final.
+        const content = response.choices[0].message.content;
+        finalResponse += content + "\n"; // Concatena as respostas
       }
 
-      resolve(finalResponse.trim()); // Retorna o resumo completo sem espaços extras.
+      resolve(finalResponse.trim());
     } catch (error) {
       console.error("Erro na solicitação para a API:", error); // Exibe o erro no console.
       reject(error); // Rejeita a Promise com o erro.

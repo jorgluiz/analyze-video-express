@@ -1,0 +1,212 @@
+diff --git a/package.json b/package.json
+index 7563200..0d0d367 100644
+--- a/package.json
++++ b/package.json
+@@ -18,7 +18,7 @@
+     "morgan": "^1.10.0",
+     "openai": "^4.77.0",
+     "path": "^0.12.7",
+-    "youtube-dl-exec": "^3.0.10"
++    "youtube-dl-exec": "^3.0.13"
+   },
+   "devDependencies": {
+     "nodemon": "^3.0.1"
+diff --git a/src/app.js b/src/app.js
+index b3294ff..98aea94 100644
+--- a/src/app.js
++++ b/src/app.js
+@@ -12,6 +12,8 @@ import helloRoute from "./routes/helloRouter.js";
+ import processTextInChunks from './generateTextAnalysis.js'
+ import transcribeAudioToText from './transcribeAudioToText.js'
+ 
++import { getVideoDuration } from "./middlewares.js"
++
+ const app = express();
+ 
+ 
+@@ -46,7 +48,20 @@ app.get("/", (req, res) => {
+ // Rota para análise de vídeo
+ app.post('/analyze-video', async (req, res) => {
+   const { urlVideo } = req.body;
+-  console.log(urlVideo, "urlVideo")
++  console.log(urlVideo)
++  if (!urlVideo) {
++    return res.send("error: empty_url")
++  }
++
++  // Garante que a URL comece com "https://www.youtube.com/"
++  if (!urlVideo.startsWith("https://www.youtube.com/")) {
++    return res.send("error: invalid_domain")
++  }
++
++  const duration = await getVideoDuration(urlVideo)
++  if (duration === null) {
++    return res.send("video longer than 10 minutes");
++  }
+ 
+   // Diretório temporário
+   const tempDir = path.resolve(path.resolve(), 'src/downloads');
+diff --git a/src/generateTextAnalysis.js b/src/generateTextAnalysis.js
+index cc28dce..4eebc87 100644
+--- a/src/generateTextAnalysis.js
++++ b/src/generateTextAnalysis.js
+@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== "production") {
+ // A mensagem fornece instruções para que o modelo resuma os pontos importantes do texto fornecido.
+ const systemMessage = {
+   role: "system",
+-  content: "Você está recebendo um texto dividido em múltiplos blocos. Crie um breve resumo, destacando os pontos importantes e indicando se há alguma solução ou conclusão. No final, forneça um resumo geral de todo o texto."
++  content: "Você está recebendo um texto dividido em múltiplos blocos. Crie um pequeno resumo. Descarte frases como: inscrição estão disponíveis, se inscreva no canal ou frases que pode ser inúteis."
+ };
+ 
+ // Inicializa o cliente OpenAI com a chave da API definida nas variáveis de ambiente.
+@@ -64,42 +64,27 @@ export default async function processTextInChunks(data) {
+       const transcribedVideo = data; // Armazena o texto transcrito.
+       const parts = splitTextByTokenLimit(transcribedVideo, MAX_TOKENS); // Divide o texto em blocos.
+       // console.log(parts)
++      let finalResponse = "";
+ 
+-      let finalResponse = ""; // Armazena o resumo final concatenado.
+-
+-      for (let i = 0; i < parts.length; i++) {
+-        const isLastPart = i === parts.length - 1; // Verifica se este é o último bloco.
+-        const part = parts[i];
+-
+-        // Se for o último bloco, adiciona um contexto extra à mensagem.
++      for (const part of parts) {
+         const updatedArray = [
+           systemMessage,
+           {
+             role: "user",
+-            content: part,
+-          },
+-          ...(isLastPart
+-            ? [
+-              {
+-                role: "user",
+-                content: "Todos os texto foram enviados. Agora, por favor, forneça um resumo geral de todo o texto, destacando os pontos principais e apresentando uma conclusão, se houver."
+-              },
+-            ]
+-            : []),
++            content: part
++          }
+         ];
+ 
+-        console.log(updatedArray)
+-        // Faz uma chamada para a API da OpenAI utilizando o modelo GPT-4.
+         const response = await openai.chat.completions.create({
+-          model: "gpt-4o", // Modelo utilizado.
+-          messages: updatedArray // Mensagens enviadas.
++          model: "gpt-4o",
++          messages: updatedArray
+         });
+ 
+-        const content = response.choices[0].message.content; // Extrai o conteúdo da resposta.
+-        finalResponse += content; // Concatena o conteúdo da resposta ao resultado final.
++        const content = response.choices[0].message.content;
++        finalResponse += content + "\n"; // Concatena as respostas
+       }
+ 
+-      resolve(finalResponse.trim()); // Retorna o resumo completo sem espaços extras.
++      resolve(finalResponse.trim());
+     } catch (error) {
+       console.error("Erro na solicitação para a API:", error); // Exibe o erro no console.
+       reject(error); // Rejeita a Promise com o erro.
+diff --git a/src/index.js b/src/index.js
+index 304a7c0..0d6712f 100644
+--- a/src/index.js
++++ b/src/index.js
+@@ -11,5 +11,5 @@ const server = http.createServer(app);
+ const PORT = process.env.PORT || 3333;
+ 
+ server.listen(PORT, () => {
+-  logger.info(`Server running on port ${PORT}`);
++  logger.info(`Local: http://localhost:${PORT}/`);
+ });
+diff --git a/src/public/views/index.html b/src/public/views/index.html
+index e8a5273..c2fe873 100644
+--- a/src/public/views/index.html
++++ b/src/public/views/index.html
+@@ -35,7 +35,7 @@
+       height: 100%;
+       border: 6px solid #f3f3f3;
+       /* Cor de fundo */
+-      border-top: 6px solid #3498db;
++      border-top: 6px solid #f44336;
+       /* Cor do círculo animado */
+       border-radius: 50%;
+       animation: spin 1s linear infinite;
+@@ -67,7 +67,12 @@
+     .container {
+       display: flex;
+       flex-direction: column;
+-      margin: 30px 30px;
++      padding: 0 30px;
++    }
++
++    .container #inputData {
++      border: solid 1px #111;
++      border-radius: 10px;
+     }
+ 
+     @media (min-width: 768px) {
+@@ -107,12 +112,19 @@
+       cursor: pointer;
+       border-radius: 10px;
+     }
++
++    #inputData {
++      height: 38px;
++      background-color: #f3f3f3;
++      padding: 0 10px;
++    }
+   </style>
+ </head>
+ 
+ <body>
+   <div class="container">
+-    <label for="fname">Resumo vídeo do youtube: </label>
++    <h1>Resuma vídeo do youtube em texto</h1>
++    <label for="fname">Resumo vídeo do youtube em texto:</label>
+     <input type="text" id="inputData" placeholder="cole link de um vídeo do youtube aqui">
+     <button onclick="buscarDados()">ANALISAR VÍDEO</button>
+     <p class="analyzed-text"></p>
+@@ -142,6 +154,20 @@
+         });
+ 
+         const data = await responseText.text();
++        console.log(data)
++        if (data === "video longer than 10 minutes") {
++          return alert('O video não pode ter mais de 10 minutos. Escolha outro')
++        }
++
++        if (data === "error: empty_url") {
++          const errorMessage = document.querySelector('#inputData')
++          return errorMessage.style.border = '1px solid red';
++        }
++
++        if (data === "error: invalid_domain") {
++          return alert("url começa com https://www.youtube.com/")
++        }
++
+         paragraph.innerHTML = data; // Exibe a resposta
+       } catch (error) {
+         console.log("Erro:", error);
+diff --git a/yarn.lock b/yarn.lock
+index 95ff53f..d8a29af 100644
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -1262,10 +1262,10 @@ yallist@^4.0.0:
+   resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
+   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
+ 
+-youtube-dl-exec@^3.0.10:
+-  version "3.0.10"
+-  resolved "https://registry.yarnpkg.com/youtube-dl-exec/-/youtube-dl-exec-3.0.10.tgz#89f5fada997572b112dcf84ae93f6981e16cd7e8"
+-  integrity sha512-t3ih+3bn2rFYSStuVjKVHUPyPYhPvPjIPjJZAzjFb6qD8uJxgJ5GHicSwbPkezM8IVdnoKPRkZ6XuIPHCqRRZg==
++youtube-dl-exec@^3.0.13:
++  version "3.0.13"
++  resolved "https://registry.yarnpkg.com/youtube-dl-exec/-/youtube-dl-exec-3.0.13.tgz#03df4fe63a2922c15257fbdc2df65ec3edfd0ade"
++  integrity sha512-xMCKTHGSEDCshEIwzAGRsysBVoXsLePLvEq/oOAU5gSP1kjgyHx+fiwNqO8RJZbt4LxuJG9foT6cy7iNbTqNhg==
+   dependencies:
+     bin-version-check "~6.0.0"
+     dargs "~7.0.0"

@@ -12,6 +12,8 @@ import helloRoute from "./routes/helloRouter.js";
 import processTextInChunks from './generateTextAnalysis.js'
 import transcribeAudioToText from './transcribeAudioToText.js'
 
+import { getVideoDuration } from "./middlewares.js"
+
 const app = express();
 
 
@@ -46,7 +48,20 @@ app.get("/", (req, res) => {
 // Rota para análise de vídeo
 app.post('/analyze-video', async (req, res) => {
   const { urlVideo } = req.body;
-  console.log(urlVideo, "urlVideo")
+  console.log(urlVideo)
+  if (!urlVideo) {
+    return res.send("error: empty_url")
+  }
+
+  // Garante que a URL comece com "https://www.youtube.com/"
+  if (!urlVideo.startsWith("https://www.youtube.com/")) {
+    return res.send("error: invalid_domain")
+  }
+
+  const duration = await getVideoDuration(urlVideo)
+  if (duration === null) {
+    return res.send("video longer than 10 minutes");
+  }
 
   // Diretório temporário
   const tempDir = path.resolve(path.resolve(), 'src/downloads');
