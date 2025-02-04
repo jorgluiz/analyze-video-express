@@ -35,7 +35,7 @@ app.use(express.static(path.join(path.resolve(), "public")));
 // Em resumo, middleware conecta e controla o fluxo de dados entre o cliente e o servidor.
 app.use(express.json()); // Parse JSON
 app.use(cors({
-  origin: 'http://localhost:3333', // ou 'http://localhost'
+  origin: ['http://localhost:3333', 'http://localhost:8080', 'https://analyze-video-express-production.up.railway.app/home', 'https://analyze-video-express-production.up.railway.app'] // ou 'http://localhost'
 }));
 app.use(morgan("tiny")); // Logger de requisições
 
