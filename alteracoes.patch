@@ -1,81 +1,113 @@
 diff --git a/alteracoes.patch b/alteracoes.patch
-index f43eced..e69de29 100644
+index 9ee99b4..e69de29 100644
 --- a/alteracoes.patch
 +++ b/alteracoes.patch
-@@ -1,62 +0,0 @@
+@@ -1,81 +0,0 @@
 -diff --git a/alteracoes.patch b/alteracoes.patch
--index 90db0af..e69de29 100644
+-index f43eced..e69de29 100644
 ---- a/alteracoes.patch
 -+++ b/alteracoes.patch
--@@ -1,31 +0,0 @@
+-@@ -1,62 +0,0 @@
 --diff --git a/alteracoes.patch b/alteracoes.patch
---index 7a6a0ba..e69de29 100644
+--index 90db0af..e69de29 100644
 ----- a/alteracoes.patch
 --+++ b/alteracoes.patch
---@@ -1,13 +0,0 @@
+--@@ -1,31 +0,0 @@
+---diff --git a/alteracoes.patch b/alteracoes.patch
+---index 7a6a0ba..e69de29 100644
+------ a/alteracoes.patch
+---+++ b/alteracoes.patch
+---@@ -1,13 +0,0 @@
+----diff --git a/src/public/views/index.html b/src/public/views/index.html
+----index 682b4c7..4ccf554 100644
+------- a/src/public/views/index.html
+----+++ b/src/public/views/index.html
+----@@ -145,7 +145,7 @@
+---- 
+----       try {
+----         // Envia o valor do input como JSON no corpo da requisição
+-----        const responseText = await fetch('http://localhost:3333/analyze-video', {
+----+        const responseText = await fetch('analyze-video-express-production.up.railway.app/analyze-video', {
+----           method: 'POST',
+----           headers: {
+----             'Content-Type': 'application/json'
 ---diff --git a/src/public/views/index.html b/src/public/views/index.html
----index 682b4c7..4ccf554 100644
+---index 4ccf554..cc3883e 100644
 ------ a/src/public/views/index.html
 ---+++ b/src/public/views/index.html
 ---@@ -145,7 +145,7 @@
 --- 
 ---       try {
 ---         // Envia o valor do input como JSON no corpo da requisição
-----        const responseText = await fetch('http://localhost:3333/analyze-video', {
----+        const responseText = await fetch('analyze-video-express-production.up.railway.app/analyze-video', {
+----        const responseText = await fetch('analyze-video-express-production.up.railway.app/analyze-video', {
+---+        const responseText = await fetch(' http://localhost:8080/analyze-video', {
 ---           method: 'POST',
 ---           headers: {
 ---             'Content-Type': 'application/json'
+--diff --git a/src/app.js b/src/app.js
+--index 8a976a8..111e033 100644
+----- a/src/app.js
+--+++ b/src/app.js
+--@@ -35,7 +35,7 @@ app.use(express.static(path.join(path.resolve(), "public")));
+-- // Em resumo, middleware conecta e controla o fluxo de dados entre o cliente e o servidor.
+-- app.use(express.json()); // Parse JSON
+-- app.use(cors({
+---  origin: 'http://localhost:3333', // ou 'http://localhost'
+--+  origin: ['http://localhost:3333', 'http://localhost:8080', 'https://analyze-video-express-production.up.railway.app/home', 'https://analyze-video-express-production.up.railway.app'] // ou 'http://localhost'
+-- }));
+-- app.use(morgan("tiny")); // Logger de requisições
+-- 
 --diff --git a/src/public/views/index.html b/src/public/views/index.html
---index 4ccf554..cc3883e 100644
+--index cc3883e..3468673 100644
 ----- a/src/public/views/index.html
 --+++ b/src/public/views/index.html
 --@@ -145,7 +145,7 @@
 -- 
 --       try {
 --         // Envia o valor do input como JSON no corpo da requisição
----        const responseText = await fetch('analyze-video-express-production.up.railway.app/analyze-video', {
---+        const responseText = await fetch(' http://localhost:8080/analyze-video', {
+---        const responseText = await fetch(' http://localhost:8080/analyze-video', {
+--+        const responseText = await fetch('http://localhost:8080/analyze-video', {
 --           method: 'POST',
 --           headers: {
 --             'Content-Type': 'application/json'
 -diff --git a/src/app.js b/src/app.js
--index 8a976a8..111e033 100644
+-index 111e033..6ba339c 100644
 ---- a/src/app.js
 -+++ b/src/app.js
--@@ -35,7 +35,7 @@ app.use(express.static(path.join(path.resolve(), "public")));
+-@@ -34,9 +34,6 @@ app.use(express.static(path.join(path.resolve(), "public")));
+- // 4. Encadear lógica entre diferentes partes da aplicação.
 - // Em resumo, middleware conecta e controla o fluxo de dados entre o cliente e o servidor.
 - app.use(express.json()); // Parse JSON
-- app.use(cors({
---  origin: 'http://localhost:3333', // ou 'http://localhost'
--+  origin: ['http://localhost:3333', 'http://localhost:8080', 'https://analyze-video-express-production.up.railway.app/home', 'https://analyze-video-express-production.up.railway.app'] // ou 'http://localhost'
-- }));
+--app.use(cors({
+--  origin: ['http://localhost:3333', 'http://localhost:8080', 'https://analyze-video-express-production.up.railway.app/home', 'https://analyze-video-express-production.up.railway.app'] // ou 'http://localhost'
+--}));
 - app.use(morgan("tiny")); // Logger de requisições
 - 
--diff --git a/src/public/views/index.html b/src/public/views/index.html
--index cc3883e..3468673 100644
----- a/src/public/views/index.html
--+++ b/src/public/views/index.html
--@@ -145,7 +145,7 @@
-- 
--       try {
--         // Envia o valor do input como JSON no corpo da requisição
---        const responseText = await fetch(' http://localhost:8080/analyze-video', {
--+        const responseText = await fetch('http://localhost:8080/analyze-video', {
--           method: 'POST',
--           headers: {
--             'Content-Type': 'application/json'
+- // Rotas de páginas
 diff --git a/src/app.js b/src/app.js
-index 111e033..6ba339c 100644
+index 6ba339c..111e033 100644
 --- a/src/app.js
 +++ b/src/app.js
-@@ -34,9 +34,6 @@ app.use(express.static(path.join(path.resolve(), "public")));
+@@ -34,6 +34,9 @@ app.use(express.static(path.join(path.resolve(), "public")));
  // 4. Encadear lógica entre diferentes partes da aplicação.
  // Em resumo, middleware conecta e controla o fluxo de dados entre o cliente e o servidor.
  app.use(express.json()); // Parse JSON
--app.use(cors({
--  origin: ['http://localhost:3333', 'http://localhost:8080', 'https://analyze-video-express-production.up.railway.app/home', 'https://analyze-video-express-production.up.railway.app'] // ou 'http://localhost'
--}));
++app.use(cors({
++  origin: ['http://localhost:3333', 'http://localhost:8080', 'https://analyze-video-express-production.up.railway.app/home', 'https://analyze-video-express-production.up.railway.app'] // ou 'http://localhost'
++}));
  app.use(morgan("tiny")); // Logger de requisições
  
  // Rotas de páginas
+diff --git a/src/public/views/index.html b/src/public/views/index.html
+index 3468673..682b4c7 100644
+--- a/src/public/views/index.html
++++ b/src/public/views/index.html
+@@ -145,7 +145,7 @@
+ 
+       try {
+         // Envia o valor do input como JSON no corpo da requisição
+-        const responseText = await fetch('http://localhost:8080/analyze-video', {
++        const responseText = await fetch('http://localhost:3333/analyze-video', {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json'
