@@ -8,8 +8,8 @@ if (process.env.NODE_ENV !== "production") {
 }
 const server = http.createServer(app);
 
-const PORT = process.env.PORT || 3333;
+const PORT = process.env.PORT || 8080;
 
 server.listen(PORT, () => {
-  logger.info(`Local: http://localhost:${PORT}/`);
+  logger.info(`backend: http://localhost:${PORT}/`);
 });
