@@ -79,7 +79,16 @@ app.post('/analyze-video', async (req, res) => {
     // Baixa o áudio do vídeo do YouTube
     // A função `youtubedl` é utilizada para executar o download do áudio do vídeo fornecido na URL (`urlVideo`).
     // O áudio será salvo no caminho especificado (`audioPath`) no formato de melhor qualidade disponível (`bestaudio`).
-    await youtubedl(urlVideo, { output: audioPath, format: 'bestaudio' });
+    await youtubedl(urlVideo, {
+      output: audioPath,
+      format: 'bestaudio'
+    }).then(() => {
+      console.log("Áudio baixado com sucesso:", audioPath);
+    }).catch(err => {
+      console.error("Erro ao baixar áudio:", err);
+      isProcessing = false; // Certifique-se de liberar o estado
+      throw err;
+    });
 
     console.timeEnd("áudio baixado");
 
