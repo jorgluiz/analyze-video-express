@@ -73,7 +73,7 @@ app.post('/analyze-video', async (req, res) => {
 
   // Diretório temporário
   const tempDir = path.resolve(path.resolve(), 'src/downloads');
-  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
   // Caminhos temporários únicos
   const audioPath = path.resolve(tempDir, 'audio.mp3');
