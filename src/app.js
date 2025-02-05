@@ -15,10 +15,10 @@ import transcribeAudioToText from './transcribeAudioToText.js'
 import { getVideoDuration } from "./middlewares.js"
 
 // Caminho para o arquivo de cookies exportado
-const cookiesFile = path.resolve(path.resolve(), 'cookies.txt');
+const cookiesFile = path.resolve('cookies.txt');
 
-// Ler o conteúdo do arquivo de forma síncrona
-const dataCookies = fs.readFileSync(cookiesFile, 'utf8');
+console.log(cookiesFile)
+
 
 const app = express();
 
@@ -84,17 +84,18 @@ app.post('/analyze-video', async (req, res) => {
     // Baixa o áudio do vídeo do YouTube
     // A função `youtubedl` é utilizada para executar o download do áudio do vídeo fornecido na URL (`urlVideo`).
     // O áudio será salvo no caminho especificado (`audioPath`) no formato de melhor qualidade disponível (`bestaudio`).
-    await youtubedl(urlVideo, {
-      cookies: dataCookies,       // Adicionando cookies
+    youtubedl(videoUrl, {
       output: audioPath,
-      format: 'bestaudio'
-    }).then(() => {
-      console.log("Áudio baixado com sucesso:", audioPath);
+      format: 'bestaudio',
+      extractAudio: true,
+      audioFormat: 'mp3',
+      cookies: cookiesFile // Se necessário
+    }).then(output => {
+      console.log('Áudio baixado com sucesso!', output);
     }).catch(err => {
-      console.error("Erro ao baixar áudio:", err);
-      isProcessing = false; // Certifique-se de liberar o estado
-      throw err;
+      console.error('Erro ao baixar áudio:', err);
     });
+
 
     console.timeEnd("áudio baixado");
 
