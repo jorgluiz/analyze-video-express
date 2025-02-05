@@ -61,6 +61,9 @@ app.post('/analyze-video', async (req, res) => {
   }
 
   const duration = await getVideoDuration(urlVideo)
+  if (duration) {
+    return console.log("duração: " + duration)
+  }
   if (duration === null) {
     return res.send("video longer than 10 minutes");
   }
