@@ -33,27 +33,38 @@
 
 // _______________________________________________________________________________________________
 
-// import ytdl from '@distube/ytdl-core';
+import ytdl from '@distube/ytdl-core';
+import fs from 'fs';
 
-// export async function getVideoDuration(urlVideo) {
-//   try {
-//     // Obtém os dados do vídeo
-//     const info = await ytdl.getInfo(urlVideo);
+// Carrega os cookies de um arquivo de texto (ou defina manualmente)
+const cookies = fs.readFileSync('cookies.txt', 'utf8');
 
-//     // A duração do vídeo está disponível dentro de 'formats'
-//     const durationInSeconds = info.videoDetails.lengthSeconds;
+export async function getVideoDuration(urlVideo) {
+  try {
+    // Obtém os dados do vídeo
+    // Obtém as informações do vídeo passando os cookies
+    const info = await ytdl.getInfo(urlVideo, {
+      requestOptions: {
+        headers: {
+          cookie: cookies, // Passa os cookies na requisição
+        },
+      },
+    });
 
-//     if (durationInSeconds <= 660) {
-//       console.log('Vídeo aceito. Duração:', durationInSeconds, 'segundos');
-//       return durationInSeconds;
-//     } else {
-//       console.log('Vídeo não aceito. Duração:', durationInSeconds, 'segundos');
-//       return null; // Ou pode lançar um erro
-//     }
-//   } catch (error) {
-//     console.error('Erro ao obter duração do vídeo:', error);
-//   }
-// }
+    // A duração do vídeo está disponível dentro de 'formats'
+    const durationInSeconds = info.videoDetails.lengthSeconds;
+
+    if (durationInSeconds <= 660) {
+      console.log('Vídeo aceito. Duração:', durationInSeconds, 'segundos');
+      return durationInSeconds;
+    } else {
+      console.log('Vídeo não aceito. Duração:', durationInSeconds, 'segundos');
+      return null; // Ou pode lançar um erro
+    }
+  } catch (error) {
+    console.error('Erro ao obter duração do vídeo:', error);
+  }
+}
 
 //_______________________________________________________________________________________________
 
@@ -84,31 +95,31 @@
 //_______________________________________________________________________________________________
 
 
-import ytScraper from 'yt-scraper';
+// import ytScraper from 'yt-scraper';
 
-export async function getVideoDuration(urlVideo) {
-  try {
-    // Obtém os metadados do vídeo
-    const videoData = await ytScraper.videoInfo(urlVideo);
+// export async function getVideoDuration(urlVideo) {
+//   try {
+//     // Obtém os metadados do vídeo
+//     const videoData = await ytScraper.videoInfo(urlVideo);
 
-    console.log("Duração do vídeo:", videoData.length);
+//     console.log("Duração do vídeo:", videoData.length);
 
-    if (!videoData || videoData.length == null) {
-      throw new Error('Não foi possível obter a duração do vídeo.');
-    }
+//     if (!videoData || videoData.length == null) {
+//       throw new Error('Não foi possível obter a duração do vídeo.');
+//     }
 
-    // Como `videoData.length` já está em segundos, não precisa de conversão
-    const durationInSeconds = Number(videoData.length);
+//     // Como `videoData.length` já está em segundos, não precisa de conversão
+//     const durationInSeconds = Number(videoData.length);
 
-    if (durationInSeconds <= 660) {
-      console.log('Vídeo aceito. Duração:', durationInSeconds, 'segundos');
-      return durationInSeconds;
-    } else {
-      console.log('Vídeo não aceito. Duração:', durationInSeconds, 'segundos');
-      return null;
-    }
-  } catch (error) {
-    console.error('Erro ao obter duração do vídeo:', error);
-    return null;
-  }
-}
+//     if (durationInSeconds <= 660) {
+//       console.log('Vídeo aceito. Duração:', durationInSeconds, 'segundos');
+//       return durationInSeconds;
+//     } else {
+//       console.log('Vídeo não aceito. Duração:', durationInSeconds, 'segundos');
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error('Erro ao obter duração do vídeo:', error);
+//     return null;
+//   }
+// }
