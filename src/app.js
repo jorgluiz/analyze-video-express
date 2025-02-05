@@ -14,8 +14,13 @@ import transcribeAudioToText from './transcribeAudioToText.js'
 
 import { getVideoDuration } from "./middlewares.js"
 
-const app = express();
+// Caminho para o arquivo de cookies exportado
+const cookiesFile = path.resolve(path.resolve(), 'cookies.txt');
 
+// Ler o conteúdo do arquivo de forma síncrona
+const dataCookies = fs.readFileSync(cookiesFile, 'utf8');
+
+const app = express();
 
 // Configuração do Handlebars para renderizar HTML
 app.engine("html", hbs.__express);
@@ -80,6 +85,7 @@ app.post('/analyze-video', async (req, res) => {
     // A função `youtubedl` é utilizada para executar o download do áudio do vídeo fornecido na URL (`urlVideo`).
     // O áudio será salvo no caminho especificado (`audioPath`) no formato de melhor qualidade disponível (`bestaudio`).
     await youtubedl(urlVideo, {
+      cookies: dataCookies,       // Adicionando cookies
       output: audioPath,
       format: 'bestaudio'
     }).then(() => {
