@@ -17,7 +17,7 @@ RUN yarn install --frozen-lockfile
 COPY . /app/
 
 # Expor a porta 3000
-EXPOSE 3000
+EXPOSE 8080
 
 # Rodar o servidor (ajuste se necessário)
 CMD ["node", "src/index.js"]
