@@ -18,7 +18,7 @@
     "morgan": "^1.10.0",
     "openai": "^4.77.0",
     "path": "^0.12.7",
-    "youtube-dl-exec": "^3.0.13"
+    "youtube-dl-exec": "3.0.10"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
