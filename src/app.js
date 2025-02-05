@@ -61,6 +61,7 @@ app.post('/analyze-video', async (req, res) => {
   }
 
   const duration = await getVideoDuration(urlVideo)
+
   if (duration === null) {
     return res.send("video longer than 10 minutes");
   }
@@ -71,7 +72,7 @@ app.post('/analyze-video', async (req, res) => {
 
   // Caminhos temporários únicos
   const audioPath = path.resolve(tempDir, 'audio.mp3');
-  // if (fs.existsSync(audioPath)) fs.unlinkSync(audioPath);
+  if (fs.existsSync(audioPath)) fs.unlinkSync(audioPath);
 
   try {
     console.time("áudio baixado");
@@ -79,8 +80,6 @@ app.post('/analyze-video', async (req, res) => {
     // A função `youtubedl` é utilizada para executar o download do áudio do vídeo fornecido na URL (`urlVideo`).
     // O áudio será salvo no caminho especificado (`audioPath`) no formato de melhor qualidade disponível (`bestaudio`).
     await youtubedl(urlVideo, { output: audioPath, format: 'bestaudio' });
-
-    fs.unlinkSync(audioPath)
 
     console.timeEnd("áudio baixado");
 
