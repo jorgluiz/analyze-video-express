@@ -72,7 +72,7 @@ app.post('/analyze-video', async (req, res) => {
   // }
 
   // Diretório temporário
-  const tempDir = path.resolve(path.resolve(), 'app/src/downloads');
+  const tempDir = path.resolve(path.resolve(), 'src/downloads');
   if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
   // Caminhos temporários únicos
