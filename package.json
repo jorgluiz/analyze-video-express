@@ -19,7 +19,7 @@
     "morgan": "^1.10.0",
     "openai": "^4.77.0",
     "path": "^0.12.7",
-    "youtube-dl-exec": "3.0.15",
+    "youtube-dl-exec": "3.0.10",
     "yt-scraper": "^2.2.0",
     "ytdl-core": "^4.11.5"
   },

@@ -65,11 +65,11 @@ app.post('/analyze-video', async (req, res) => {
     return res.send("error: invalid_domain")
   }
 
-  const duration = await getVideoDuration(urlVideo)
+  // const duration = await getVideoDuration(urlVideo)
 
-  if (duration === null) {
-    return res.send("video longer than 10 minutes");
-  }
+  // if (duration === null) {
+  //   return res.send("video longer than 10 minutes");
+  // }
 
   // Diretório temporário
   const tempDir = path.resolve(path.resolve(), 'src/downloads');
@@ -84,16 +84,15 @@ app.post('/analyze-video', async (req, res) => {
     // Baixa o áudio do vídeo do YouTube
     // A função `youtubedl` é utilizada para executar o download do áudio do vídeo fornecido na URL (`urlVideo`).
     // O áudio será salvo no caminho especificado (`audioPath`) no formato de melhor qualidade disponível (`bestaudio`).
-    youtubedl(urlVideo, {
+    await youtubedl(urlVideo, {
       output: audioPath,
-      format: 'bestaudio',
-      extractAudio: true,
-      audioFormat: 'mp3',
-      cookies: cookiesFile // Se necessário
-    }).then(output => {
-      console.log('Áudio baixado com sucesso!', output);
+      format: 'bestaudio'
+    }).then(() => {
+      console.log("Áudio baixado com sucesso:", audioPath);
     }).catch(err => {
-      console.error('Erro ao baixar áudio:', err);
+      console.error("Erro ao baixar áudio:", err);
+      isProcessing = false; // Certifique-se de liberar o estado
+      throw err;
     });
 
 
