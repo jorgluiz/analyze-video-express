@@ -36,20 +36,16 @@
 import ytdl from '@distube/ytdl-core';
 import fs from 'fs';
 
-// Carrega os cookies de um arquivo de texto (ou defina manualmente)
-const cookies = fs.readFileSync('cookies.txt', 'utf8');
+// Read the cookies from a JSON file
+const cookies = JSON.parse(fs.readFileSync('cookies.json'));
+
+const agent = ytdl.createAgent(cookies);
 
 export async function getVideoDuration(urlVideo) {
   try {
     // Obtém os dados do vídeo
     // Obtém as informações do vídeo passando os cookies
-    const info = await ytdl.getInfo(urlVideo, {
-      requestOptions: {
-        headers: {
-          cookie: cookies, // Passa os cookies na requisição
-        },
-      },
-    });
+    const info = await ytdl.getInfo(urlVideo, { agent })
 
     // A duração do vídeo está disponível dentro de 'formats'
     const durationInSeconds = info.videoDetails.lengthSeconds;
